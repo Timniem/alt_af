@@ -16,20 +16,20 @@ def collect_snv_inheritance(vcf_dict):
     if (vcf_dict["index"] and vcf_dict["mother"] and vcf_dict["father"]):
         inheritance_dict = settings.inheritance_dict_trio
         
-        cmd = ["bcftools isec -n +1 " + vcf_dict["index"] + " " + vcf_dict["mother"] + " " + vcf_dict["father"]]
+        cmd = ["bcftools isec -n +1 -e 'GT=\"ref\"' " + vcf_dict["index"] + " " + vcf_dict["mother"] + " " + vcf_dict["father"]]
         domain_setting = "trio"
     
     # 2. index and mother:
     elif (vcf_dict["index"] and vcf_dict["mother"]):
         inheritance_dict = settings.inheritance_dict_duo_mother
 
-        cmd = ["bcftools isec -n +1 " + vcf_dict["index"] + " " + vcf_dict["mother"] ]
+        cmd = ["bcftools isec -n +1 -e 'GT=\"ref\" " + vcf_dict["index"] + " " + vcf_dict["mother"] ]
         domain_setting = "duo_mat"
 
     # 3. index and father:
     elif (vcf_dict["index"] and vcf_dict["father"]):
         inheritance_dict = settings.inheritance_dict_duo_father
-        cmd = ["bcftools isec -n +1 " + vcf_dict["index"] + " " + vcf_dict["father"] ]
+        cmd = ["bcftools isec -n +1 -e 'GT=\"ref\" " + vcf_dict["index"] + " " + vcf_dict["father"] ]
         domain_setting = "duo_pat"
 
     if cmd:
@@ -59,9 +59,9 @@ def read_vcf_file(vcf_file):
 
     try:
         for variant in VCF(vcf_file):
-            
+
             # some variants have no alt allele, these return "[]" as ALT 
-            if not variant.ALT == []:
+            if (not variant.ALT == []) or (not variant.INFO['AF'] == 0):
                 # calculate altAF from alt alleles and depth
                 ad = variant.format('AD') #TODO -> move to settings
                 dp = variant.format('DP') #TODO -> move to settings
