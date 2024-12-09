@@ -23,13 +23,13 @@ def collect_snv_inheritance(vcf_dict):
     elif (vcf_dict["index"] and vcf_dict["mother"]):
         inheritance_dict = settings.inheritance_dict_duo_mother
 
-        cmd = ["bcftools isec -n +1 -e 'GT=\"ref\" " + vcf_dict["index"] + " " + vcf_dict["mother"] ]
+        cmd = ["bcftools isec -n +1 -e 'GT=\"ref\"' " + vcf_dict["index"] + " " + vcf_dict["mother"] ]
         domain_setting = "duo_mat"
 
     # 3. index and father:
     elif (vcf_dict["index"] and vcf_dict["father"]):
         inheritance_dict = settings.inheritance_dict_duo_father
-        cmd = ["bcftools isec -n +1 -e 'GT=\"ref\" " + vcf_dict["index"] + " " + vcf_dict["father"] ]
+        cmd = ["bcftools isec -n +1 -e 'GT=\"ref\"' " + vcf_dict["index"] + " " + vcf_dict["father"] ]
         domain_setting = "duo_pat"
 
     if cmd:
