@@ -61,7 +61,7 @@ def read_vcf_file(vcf_file):
         for variant in VCF(vcf_file):
 
             # some variants have no alt allele, these return "[]" as ALT 
-            if (not variant.ALT == []) or (not variant.INFO['AF'] == 0):
+            if (variant.ALT != []) and (variant.INFO['AF'] != 0) and (type(variant.INFO['AF']) != tuple):
                 # calculate altAF from alt alleles and depth
                 ad = variant.format('AD') #TODO -> move to settings
                 dp = variant.format('DP') #TODO -> move to settings
