@@ -61,7 +61,7 @@ def read_vcf_file(vcf_file):
         for variant in VCF(vcf_file):
 
             # some variants have no alt allele, these return "[]" as ALT 
-            if (variant.ALT != []) and (variant.INFO['AF'] != 0) and (type(variant.INFO['AF']) != tuple):
+            if (variant.ALT != []):
                 # calculate altAF from alt alleles and depth
                 ad = variant.format('AD') #TODO -> move to settings
                 dp = variant.format('DP') #TODO -> move to settings
@@ -69,7 +69,10 @@ def read_vcf_file(vcf_file):
                 if (ad is None) or (dp is None):
                     altaf = 0
                 else:
-                    altaf = ad[0,1] / dp[0,0]
+                    if ad[0,1] == 0:
+                        continue # No allelic depth for alt, continue to next iteration
+                    else:
+                        altaf = ad[0,1] / dp[0,0]
 
                 li_chr.append(variant.CHROM)
                 li_start.append(variant.POS)
