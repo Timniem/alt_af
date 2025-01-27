@@ -12,6 +12,7 @@ from data_handling import general_functions
 
 @st.cache_data
 def collect_snv_inheritance(vcf_dict):
+    # Added exclusion of ref/ref calls.
     # 1. index, mother and father:
     if (vcf_dict["index"] and vcf_dict["mother"] and vcf_dict["father"]):
         inheritance_dict = settings.inheritance_dict_trio
@@ -65,11 +66,20 @@ def read_vcf_file(vcf_file):
                 # calculate altAF from alt alleles and depth
                 ad = variant.format('AD') #TODO -> move to settings
                 dp = variant.format('DP') #TODO -> move to settings
-                
-                if (ad is None) or (dp is None):
-                    altaf = 0
+                gt = variant.genotypes
+
+                # Both allelic depth as well as genotype field are checked for ref/ref calls.
+
+                if len(gt[0]) > 2:
+                    if (gt[0][0] < 1) and (gt[0][1] < 1): # if not het or hom for alt, skip variant
+                        continue
                 else:
-                    if ad[0,1] == 0:
+                    continue # length of the gt field < 3 meaning no gt often: [-1, False]
+
+                if (ad is None) or (dp is None):
+                    continue # skip none dp and ad
+                else:
+                    if ad[0,1] == 0: # maybe implement a threshold, for more accurate calling?
                         continue # No allelic depth for alt, continue to next iteration
                     else:
                         altaf = ad[0,1] / dp[0,0]
